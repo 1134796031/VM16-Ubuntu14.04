@@ -1,0 +1,41 @@
+1、安装Maven
+首先需要安装Java，之后下载apache-maven-3.8.6-bin.tar.gz并复制到虚拟机桌面
+https://maven.apache.org/download.cgi?login=from_csdn
+将tar.gz解压到/usr/local目录下，并将解压得到的文件夹名该为maven
+sudo tar -zxf /home/mxk/Desktop/apache-maven-3.8.6-bin.tar.gz -C /usr/local
+cd /usr/local/
+sudo mv ./apache-maven-3.8.6/ ./maven
+cd /usr/local/maven/conf/
+在根目录下创建maven资源库目录
+sudo mkdir -p /m2/repository
+编辑settings.xml文件，向其中添加阿里云国内镜像
+cd /usr/local/maven/conf/
+sudo gedit settings.xml
+为maven设置环境变量
+sudo gedit ~/.bashrc
+export MAVEN_HOME=/usr/local/maven
+export PATH=$PATH:$MAVEN_HOME/bin
+source ~/.bashrc
+检查maven版本
+mvn -version
+
+2、Maven命令
+新建Maven项目框架
+mvn archetype:generate -DgroupId=[xxx] DartifactId=[yyy] -Dpackage=[zzz] -Dversion=[0.1-SNAPSHOT]
+mvn compile	编译项目源码
+mvn test		运行测试
+mvn package	将项目打包
+mvn install	将项目安装到本地库
+mvn clean		清除已生成的项
+
+在IDEA中创建Maven项目并编译为jar
+NewProject->Maven->helloworld，得到helloworld/src/main/java/org.pasalab.helloworld/App.java
+cd helloworld
+mvn package
+java -cp ./target/helloworld-0.1.jar org.pasalab.helloworld.App
+
+
+
+
+
+

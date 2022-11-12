@@ -1,0 +1,84 @@
+1、下载Git
+我们需要先把Git的安装包下载下来，访问网址：https://git-for-windows.github.io/
+或者百度网盘：链接: https://pan.baidu.com/s/1A7MKIoGGPZ4n6Gk03gwasQ 提取码: h87w
+点击Download开始下载，下载完成后双击安装包进行安装，之后一直点击“下一步”就可以完成安装了。
+
+2、创建代码仓库
+git config --global user.name "Mxk"
+git config --global user.email "XiangKaiMar@gmail.com"
+创建成功后可以使用git config --global user.name/email查看信息
+
+3、建立本地代码仓库
+mkdir D:/GitRepository
+cd D:/GitRepository
+git init
+仓库创建完成后会在D:/GitRepository下生成一个隐藏的.git文件夹，如果向删除本地仓库，删除该.git文件夹即可
+
+4、添加并提交本地代码
+首先使用add命令添加代码，再使用commit提交被添加的代码
+添加单个D:/GitRepository下的build.txt文件
+git add build.txt
+添加D:/GitRepository下的app目录下的所有文件
+git add app
+添加D:/GitRepository下的全部文件
+git add .
+
+使用commit提交时，必须使用-m参数来附上描述信息的字符串
+git commit -m"Commit by Mxk in 2022.7.1"
+
+5、查看修改内容
+在根目录输入命令，以查看整个D:/GitRepository代码仓库中，自从上次commit后新增或删减的文件
+git status
+
+查看所有文件内的更改内容、具体查看某个文件内的更改内容
+git diff
+git diff test.txt
+
+6、撤销对某个文件尚未commit的修改
+若该文件尚未add
+git checkout test.txt
+若该文件已经add，则先用reset取消对其的add操作
+git reset HEAD test.txt
+
+7、查看某个长期项目之前每次提交的修改内容
+使用log命令查看指定文件的历史提交信息
+查看全部历史提交信息，每条记录都会显示id-提交人-提交日期-描述信息
+git log
+通过id来指定查看某一条记录，使用-1参数表明只想看到一条记录
+git log 1fa380b502a00b82bfc8d84c5ab5e15b8fbf7dac -1
+通过id来指定查看某一条记录，并查看该次提交具体修改了什么内容
+git log 1fa380b502a00b82bfc8d84c5ab5e15b8fbf7dac -1 -p
+
+8、分支和主干
+当我们确定了一个较稳定的版本后，可以将其作为主干线master，并建立分支branch继续开发而不会破坏master，注意，D:/GitRepository必须要经过至少一次commit后才能创建分支
+创建分支
+git branch MxkVersion1.0
+查看全部分支和主干
+git branch
+将接下来对仓库的操作切换到指定分支上
+git checkout MxkVersion1.0
+当我们在MxkVesion1.0上改了个bug，并希望在主干上也类似修改该bug，使用merge完成合并操作
+git checkout master
+git merge MxkVersion1.0
+当我们想删除MxkVersion1.0这个分支时
+git branch -D MxkVersion1.0
+
+9、Github与本地的交互
+首先需要打开本地代理，并关闭git本身的代理
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+将别人的项目全部部署在本地
+mkdir D:/GitRepository
+cd D:/GitRepository
+git init
+git clone https://github.com/Antabot/White-Jotter
+当我对项目进行了修改和提交后，使用push将本地的修改内容同步到Github上
+git push https://github.com/Antabot/White-Jotter D:/GitRepository/White-Jotter
+将Github上的修改同步到本地
+git pull https://github.com/Antabot/White-Jotter D:/GitRepository/White-Jotter
+
+事实上，如果我们将https://github.com/Antabot/White-Jotter抽象为A，将D:/GitRepository/White-Jotter抽象为B
+则pull命令所执行的工作可以拆分为fetch和merge两个命令，首先git fetch A B，将远程的A中代码同步到本地的B
+但同步下来的代码不会合并到任何分支上去，而时放在分支A/B上，可以使用git diff A/B来查看同步下来的代码有哪些修改
+再使用merge命令将分支A/B上的修改同步到主干master上

@@ -1,0 +1,71 @@
+查看python-pytorch-cuda-cudnn
+import torch
+import platform
+print(platform.python_version())                	# 3.9.12
+print(torch.__version__)                        		# 1.12.1+cu116
+print(torch.version.cuda)                       		# 11.6
+print(torch.backends.cudnn.version())           	# 8302
+print(torch.cuda.is_available())                	# True
+import tensorflow as tf
+print(tf.__version__)   # 获取安装的tensorflow版本
+print(tf.__path__)      # 查看tensorflow安装路径
+
+一、安装CUDA、Cudnn
+1、首先注意，pytorch不能适配高版本的cuda和cudnn，首先进入https://pytorch.org/get-started/locally/
+查看命令语句以确定，所能支持的最高cuda版本，再找与该cuda对应的cudnn版本
+2、https://blog.csdn.net/cd_yourheart/article/details/119851855
+安装完CUDA和Cudnn后设置环境变量
+https://blog.csdn.net/qq_41456316/article/details/121522097
+GPU适配的cuda版本：NVIDIA CUDA 11.7.101  driver
+但由于pytorch最高支持CUDA 11.7，因此可以下载11.7版本
+下载cuda版本：windows-x86_64-10-exe(local)，cuda_11.3.0_465.89_win10.exe
+下载cudnn版本：v8.2.1 (June 7th, 2021), for CUDA 11.x
+
+二、安装Anaconda3、torch
+下载并安装Anaconda3：https://www.anaconda.com/products/individual 
+在Anaconda3的终端 Anaconda Prompt (Anaconda3) 中使用pip或conda命令直接下载pytorch-gpu
+conda命令见：https://pytorch.org/
+注意，若conda命令下载太慢，可以使用pip命令下载pytorch-gpu
+
+三、安装Pycharm2021.3.1社区版（免费）
+使用Pycharm新建项目/打开已有项目，并为项目配置Anaconda3目录下的python.exe
+设置字体：Settings - Editor - Font - (JetBrains Mono, Size 16, Line height 1.0)
+配置编译器：Settings - Python Interpreter - Add - Existing environment - ./Anaconda3/python.exe
+
+四、安装TeXLive2021、TeXStudio
+https://blog.csdn.net/aiboom/article/details/120060315
+https://blog.csdn.net/wayne6515/article/details/119395389
+
+五、安装VS2019，配置C++和Python
+下载VS2019：https://visualstudio.microsoft.com/zh-hans/vs/older-downloads/
+
+六、为VS2019配置Jetbrains的字体
+https://blog.csdn.net/zhoutianzi12/article/details/115358761
+
+七、Go和GoLand
+Goland破解版
+https://blog.laoplayer.com/a/jishujiaocheng/2021/0512/66.html
+Goland配置Go环境、新建项目文件
+https://blog.csdn.net/qq_44702847/article/details/108597386
+
+八、IDEA2022.1.3、jdk1.8
+首先下载并安装JDK1.8
+https://blog.csdn.net/weixin_37601546/article/details/88623530
+其次下载并安装IDEA2022.1.3
+https://blog.csdn.net/qq_41647999/article/details/83445878
+
+九、MySQL8.0.15
+https://blog.csdn.net/qq_42397270/article/details/118326875
+用户名	root
+密码	123456
+端口号	localhost:3306
+
+十、IDEA
+https://www.exception.site/essay/how-to-free-use-intellij-idea-2019-3
+
+十一、CiteSpace
+安装教程
+https://zhuanlan.zhihu.com/p/146197586
+使用教程
+https://blog.csdn.net/zhoujiaaw/article/details/124675256
+https://blog.csdn.net/smartdazhi/article/details/78077156

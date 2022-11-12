@@ -1,0 +1,285 @@
+1、安装Anaconda3
+下载/home/mxk/Downloads/Anaconda3-2022.10-Linux-x86_64.sh
+cd /home/mxk/Downloads/
+bash Anaconda3-2022.10-Linux-x86_64.sh
+为conda命令配置环境变量
+sudo gedit ~/.bashrc
+找到anaconda3的位置，在最后一行新加一行
+export PATH=$PATH:/home/mxk/anaconda3/bin
+保存并退出后激活用户目录
+source ~/.bashrc
+查看anaconda中包含的库，检验Anaconda是否安装成功
+conda list
+
+打开anaconda的可视化界面
+anaconda-navigator
+
+打开AncondaPrompt
+cd /home/mxk/anaconda3/
+conda activate
+退出AnacondaPrompt
+conda deactivate
+
+2、安装pycharm
+下载/home/mxk/Downloads/pycharm-community-2021.1.3.tar.gz
+将其解压到/home/mxk下
+sudo tar -zxf /home/mxk/Downloads/pycharm-community-2021.1.3.tar.gz -C /home/mxk
+执行以下命令以安装Pycharm
+sudo apt-get install realpath
+cd /home/mxk/pycharm-community-2021.1.3/bin/
+sh ./pycharm.sh
+Continue->Dontsend->齿轮->CreateDesktopEntry
+创建桌面快捷方式
+sudo gedit /usr/share/applications/pycharm.desktop
+添加以下内容
+[Desktop Entry]
+Type=Application
+Name=Pycharm
+GenericName=Pycharm3
+Comment=Pycharm3:The Python IDE
+Exec="/home/mxk/pycharm-community-2021.1.3/bin/pycharm.sh" %f
+Icon=/home/mxk/pycharm-community-2021.1.3/bin/pycharm.png
+Terminal=pycharm
+Categories=Pycharm;
+添加权限
+sudo chmod +x /usr/share/applications/pycharm.desktop
+此时在/usr/share/applications/目录下已经出现了pycharm，将其发送到桌面即可
+
+在Pycharm中新建project并使用anaconda3所属的python环境
+Previously configured interpreter->Conda Environment
+Interpreter：/home/mxk/anaconda3/bin/python3.9
+CondaExecutable：/home/mxk/anaconda3/bin/conda
+
+3、安装cuda-cudnn-torch
+首先确定宿主机GPU适配的cuda版本：NVIDIA CUDA 11.7.101  driver
+3.1、安装Nvidia驱动（必须）
+
+3.2、cuda
+https://developer.nvidia.com/cuda-toolkit-archive
+下载cuda版本：Linux-x86_64-Ubuntu18.04-runfile(local)
+wget https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_linux.run
+sudo sh cuda_11.7.1_515.65.01_linux.run
+输入accept，选中Driver,CUDAToolkit11.7,CUDADemoSuite11.7,CUDADocumentation11.7，选中Install回车
+sudo gedit ~/.bashrc
+export PATH=$PATH:/usr/local/cuda-11.7/bin
+source ~/.bashrc
+查看cuda版本
+nvcc -V
+卸载cuda
+sudo /usr/local/cuda-11.7/bin/cuda-uninstaller
+sudo rm -rf /usr/local/cuda-11.7/
+3.3、cudnn
+https://developer.nvidia.com/rdp/cudnn-archive
+下载cudnn版本：cuDNN v8.5.0, for CUDA 11.x-Local Insatller for Linux x86_64(Tar)
+在宿主机上下载后复制到/home/mxk/Downloads
+tar -xvf cudnn-10.1-linux-x64-v7.6.4.38.tgz
+sudo cp cuda/include/cudnn.h    /usr/local/cuda-10.1/include/
+sudo cp cuda/lib64/libcudnn* /usr/local/cuda-10.1/lib64/
+sudo chmod a+r /usr/local/cuda-10.1/include/cudnn.h   /usr/local/cuda-10.1/lib64/libcudnn*
+
+
+
+https://blog.csdn.net/weixin_43162240/article/details/102957660
+
+4、安装指定版本的Cmake
+查看Cmake版本
+cmake --version
+进入下面网址选择想要安装的版本
+https://cmake.org/files/
+鉴于Cmake不同版本的安装方式大相径庭，这里建议安装已经成功过的3.20.0版本
+https://cmake.org/files/v3.20/cmake-3.20.0-linux-x86_64.tar.gz
+下载/home/mxk/Downloads/cmake-3.20.0-linux-x86_64.tar.gz
+将其解压到/home/mxk下
+sudo tar -zxf /home/mxk/Downloads/cmake-3.20.0-linux-x86_64.tar.gz -C /home/mxk
+执行以下命令以安装Cmake-3.20.0
+在物理机上下载cmake-3.20.0-linux-x86_64.tar.gz
+将该文件复制到虚拟机的Downloads目录下，并extract在Downloads目录下
+cd Downloads/
+sudo mv cmake-3.20.0-linux-x86_64 /opt/cmake-3.20.0
+创建软链接
+sudo ln -sf /opt/cmake-3.20.0/bin/*  /usr/bin/
+查询Cmake版本
+cmake --version
+
+若出现错误cmake: Permission denied
+则为Cmake修改执行权限
+chmod 777 cmake ccmake cmake-gui cpack ctest
+
+5、安装gcc、g++
+查看gcc和g++版本
+gcc -v
+g++ -v
+5.1、安装Ubuntu18.04自带的gcc7.5.0
+sudo apt-get install build-essential
+gcc --version
+g++ --version
+
+5.2、安装指定版本的gcc
+下载gcc-9.1.0.tar.gz并复制到虚拟机桌面
+http://mirror.linux-ia64.org/gnu/gcc/releases/gcc-9.1.0/
+将tar.gz复制到opt/gcc下并解压
+sudo mkdir /opt/gcc
+cp /home/mxk/Desktop/gcc-9.1.0.tar.gz /opt/gcc/
+cd /opt/gcc
+tar -xzvf gcc-9.1.0.tar.gz
+不要在源代码目录下编译而是在相同目录下新建build文件夹
+mkdir gcc-9.1.0-build
+联网安装gcc9.1相关依赖项
+若安装失败说明download_prerequisites中的服务器地址挂了，gedit将其中的
+base_url='ftp://gcc.gnu.org/pub/gcc/infrastructure/'替换为镜像服务器地址
+base_url='http://mirror.linux-ia64.org/gnu/gcc/infrastructure/'若还是失败则类似修改其他地址
+cd gcc-9.1.0-build
+../gcc-9.1.0/contrib/download_prerequisites
+运行configure命令生成Makefile
+../gcc-7.3.0/configure -enable-checking=release -enable-languages=c,c++ -disable-multilib
+运行make命令根据Makefile编译构建GCC编译器(耗时很长)
+make
+安装GCC编译器，默认将GCC编译器安装在/usr/local下，即
+头文件在/usr/local/include，可执行文件在/usr/local/bin，库文件在/usr/local/lib
+sudo make install
+机器上可以存在不同版本的GCC编译器，为不同版本配置优先级来设置默认GCC编译器版本
+<链接> <名称> <路径> <优先级>
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 50
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 50
+查询本机已有的GCC/G++编译器版本
+sudo update-alternatives --query gcc
+sudo update-alternatives --query g++
+选择默认使用的GCC/G++编译器版本
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+查询当前使用的gcc/g++版本
+gcc --version
+g++ --version
+降低GCC编译器版本
+首先删除已有的低优先级的老GCC配置项，再以更高优先级配置老GCC，最后更改
+sudo update-alternatives --remove gcc /usr/bin/gcc-4.8.1
+sudo update-alternatives --remove g++ /usr/bin/g++-4.8.1
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8.1 70
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8.1 70
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+
+6、安装SoPlex、SCIP、ds4dm_PySCIPOpt、ecole
+/home/mxk/PycharmProjects/BB/
+下载两个tgz文件到上面的路径
+https://soplex.zib.de/download.php?fname=soplex-4.0.1.tgz
+https://scip.zib.de/download.php?fname=scip-6.0.1.tgz
+下载vanillafullstrong.patch到上面的路径
+https://github.com/ds4dm/learn2branch/tree/master/scip_patch
+下载ecole文件夹到上面的路径
+https://github.com/pandat8/ML4LB/tree/master/ecole
+下载PySCIPOpt文件夹到上面的路径
+https://github.com/linjc16/TBranT/tree/master/PySCIPOpt
+执行以下命令将该目录下所有文件设置为"任何用户都可访问"
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+设置安装目录：
+export SCIPOPTDIR='/opt/scip'
+
+6.1、下载并安装soplex-4.0.1
+cd /home/mxk/PycharmProjects/BB
+tar -xzf soplex-4.0.1.tgz
+cd soplex-4.0.1/
+mkdir build
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$SCIPOPTDIR
+make -C ./build -j 4
+sudo make -C ./build install
+
+6.2、下载并安装scip-6.0.1
+cd /home/mxk/PycharmProjects/BB
+tar -xzf scip-6.0.1.tgz
+cd scip-6.0.1/
+patch -p1 < ../vanillafullstrong.patch
+mkdir build
+cmake -S . -B build -DSOPLEX_DIR=$SCIPOPTDIR -DCMAKE_INSTALL_PREFIX=$SCIPOPTDIR
+make -C ./build -j 4
+sudo make -C ./build install
+
+为scip和soplex配置环境，在.bashrc的最后一行添加下面语句
+sudo gedit ~/.bashrc
+export PATH=$PATH:/opt/scip/bin
+source ~/.bashrc
+
+cd /opt/
+sudo rm -rf /opt/scip-6.0.1
+sudo rm -rf /opt/soplex-4.0.1
+sudo rm /opt/scip-6.0.1.tgz
+sudo rm /opt/soplex-4.0.1.tgz
+sudo rm /opt/vanillafullstrong.patch
+
+6.3、手动将scip-6.0.1目录下的某些h文件复制到PySCIPOpt的安装目录/opt/scip
+sudo mkdir /opt/scip
+sudo mkdir /opt/scip/include
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+sudo cp -r /home/mxk/PycharmProjects/BB/scip-6.0.1/src/. /opt/scip/include/
+注意scip-6.0.1/src这个目录是隐藏的，此外scip-6.0.1/src下缺少文件config.h，因此还需要执行命令
+sudo cp /home/mxk/PycharmProjects/BB/scip-6.0.1/build/scip/config.h /opt/scip/include/scip/
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+sudo chmod 777 -Rfv /opt/scip/
+
+6.4、修改ds4dm/PySCIPOpt@ml-branching/src/pyscipopt/scip.pyx
+由于我们想要复现的实验是Hybrid-learn2branch，而下载的PySCIPOpt库支持的实验是learn2branch
+因此PySCIPOpt需要为库中的Column类新增一个方法getIndex
+否则会在02_generate_dataset.py中运行以下语句出现报错：；
+x.getCol().getIndex() for x in self.model.getVars(transformed=True
+AttributeError: 'pyscipopt.scip.Column' object has no attribute 'getIndex'
+这表明在安装的ds4dm/PySCIPOpt@ml-branching/src/pyscipopt/scip.pyx中
+Column类(294行)缺少方法getIndex：
+sudo gedit /home/mxk/PycharmProjects/BB/PySCIPOpt/src/pyscipopt/scip.pyx
+该方法实现在Hybrid-learn2branch项目的README中
+https://github.com/pg2455/Hybrid-learn2branch
+同时这个报错也出现在该项目的issues中
+https://github.com/pg2455/Hybrid-learn2branch/issues/2
+完成此步骤才能执行python setup.py install
+
+6.5、正式安装PySCIPOpt（ds4dm-ml-branching版本）
+cd /home/mxk/PycharmProjects/BB/
+git clone --branch ml-branching git@github.com:ds4dm/PySCIPOpt.git
+执行7.4修改其中的scip.pyx文件
+export SCIPOPTDIR='/opt/scip'
+cd /home/mxk/PycharmProjects/BB/PySCIPOpt
+python setup.py install
+安装成功信息为：
+Installed /home/mxk/anaconda3/lib/python3.9/site-packages/PySCIPOpt-2.1.5-py3.9-linux-x86_64.egg
+Processing dependencies for PySCIPOpt==2.1.5
+Finished processing dependencies for PySCIPOpt==2.1.5
+
+6.6、安装本地的PySCIPOpt（tsinghua版本）
+下载PySCIPOpt文件夹到上面的路径
+https://github.com/linjc16/TBranT/tree/master/PySCIPOpt
+执行以下命令将该目录下所有文件设置为"任何用户都可访问"
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+cd /home/mxk/PycharmProjects/BB/PySCIPOpt
+export SCIPOPTDIR='/opt/scip'
+python setup.py install
+
+6.7、安装远程的ecole
+
+6.8、安装本地的ecole
+首先需要本地安装Cmake>=3.15,gcc/g++>=9.1,SCIP,python,numpy
+下载ecole文件夹到上面的路径
+https://github.com/pandat8/ML4LB/tree/master/ecole
+执行以下命令将该目录下所有文件设置为"任何用户都可访问"
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+cd /home/mxk/PycharmProjects/BB/ecole
+cmake -B build/
+cmake --build build/ --parallel
+python -m pip install build/python
+
+6.9、安装svmrank
+git clone http://github.com/ds4dm/PySVMRank.git
+cd PySVMRank
+wget http://download.joachims.org/svm_rank/current/svm_rank.tar.gz
+mkdir src/c
+tar -xzf svm_rank.tar.gz -C src/c
+pip install .
+
+
+
+
+
+
+
+
+
+
+

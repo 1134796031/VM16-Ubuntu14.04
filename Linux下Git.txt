@@ -1,0 +1,177 @@
+sudo apt-get install git
+git --version
+
+0、关于Git的准备工作
+0.1、设置rsa公私钥
+0.1.1、首先检查git是否能连接到Github
+ssh -T git@github.com
+若出现Permission denied (publickey)则表明可以连接，但为设置基于RSA的公私钥
+0.1.2、检查已有的ssh keys
+cd ~/.ssh
+ls
+发现存在四个钥
+authorized_keys  id_dsa  id_dsa.pub  id_rsa  id_rsa.pub
+将四个钥备份并删除
+mkdir key_backup
+cp id_rsa* key_backup
+rm id_rsa*
+cp id_dsa* key_backup
+rm id_dsa*
+0.1.3、根据指定邮箱生成公私钥
+ssh-keygen -t rsa -C "xiangkai.ma@smail.nju.edu.cn"
+输入文件名：id_rsa
+输入密码：直接回车从而在执行git命令时不需要输入密码
+再次输入密码：直接回车
+执行命令ls可知在~/.ssh目录下新建了文件id_rsa(私钥)和id_rsa.pub(公钥)
+0.1.4、将id_rsa.pub(公钥)文件中的内容添加到github中
+sudo gedit id_rsa.pub
+将其中的字符串复制到Github->Settings->SSHKeys->New SSH Key->Key
+eval "$(ssh-agent -s)"
+ssh-add
+再次检查SSH连接情况
+cd ~/.ssh
+ssh -T git@github.com
+出现“Hi 1134796031! You’ve successfully authenticated”表示公私钥配置成功
+
+0.2、配置用户名和邮箱地址
+git onfig --global user.name "Xiangkai"
+git config --global user.email "xiangkai.ma@smail.nju.edu.cn"
+0.3、设置本地仓库，所有项目都部署在本地
+sudo mkdir /home/mxk/localGitRepo
+0.4、设置访问令牌token
+由于Github不支持用户名密码的验证方式需要在网页上创建个人访问令牌token
+Setting->DeveloperSettings->Token(classic)->GenerateNewToken->NoExpiration->全部勾选->GenerateToken
+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
+安装github提供的gh工具，在一台机器上安装gh并认证token后，该机器再执行git命令不会再出问题
+但在更换了新的机器后，需要在网页上重新获取一个token并在新机器上绑定这个新token
+安装gh
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+sudo apt-add-repository https://cli.github.com/packages
+sudo apt update
+sudo apt install gh
+使用gh认证token
+gh auth login
+依次选择：GitHub.com->HTTPS->y->PasteAnAuthenticationToken->
+
+0.5、抛弃HTTPS彻底改用SSH以解决全部网络问题
+由于墙的原因，使用基于HTTPS协议的git命令总会遇到"拒绝连接"的问题，解决方法如下
+完成上述步骤后，在使用git install push pull clone命令时可以抛弃基于HTTPS协议的传输
+git clone https://github.com/mxksnd/PySCIPOpt.git
+而改用基于SSH协议的传输
+git clone git@github.com:mxksnd/PySCIPOpt.git
+
+0.6、安装库的指定分支和版本
+安装指定分支ml-branching，其中分支名可在项目网页的Branches中查看
+git clone -b ml-branching git@github.com:ds4dm/PySCIPOpt.git
+安装指定版本，其中版本名可在项目网页的Tags中查看
+git clone -b v1.4.5 git@github.com:ds4dm/PySCIPOpt.git
+其中如果不指定版本和分支，则默认下载main的最新版本
+其次由于只有main才具有分支，所以不存在需要同时指定版本和分支的情况
+
+0.7、在hosts文件中配置IP和域名的映射（可选）
+事实上只有基于HTTPS协议的git命令才需要进行次配置，基于SSH此配置反而会报错
+但本着广开言路的目的还是记载host的配置方法和意义：
+在使用git命令进行http访问时，需要将域名https://github转换为对应的ip
+这个过程首先会查找本地hosts文件中是否有域名和ip的对应关系，如果没找到才会进行DNS解析
+首先访问下面地址
+https://ipaddress.com/website/github.com
+得到域名github对应的ip地址
+140.82.112.4
+在linux下修改hosts文件
+sudo gedit /etc/hosts
+140.82.112.4 github.com
+在windows下修改hosts文件
+C:\Windows\System32\drivers\etc目录下右键管理员权限运行
+140.82.112.4 github.com
+
+1、创建新项目
+本地修改后并将其push到远程仓库
+1.1、在本地仓库localGitRepo中新建项目testRepo
+cd /home/mxk/localGitRepo
+sudo mkdir testRepo
+cd /home/mxk/localGitRepo/testRepo
+初始化git项目格式，生成.git文件夹
+sudo git init
+1.2、在远程仓库Github.com中新建项目testRepo
+新项目中包括LICENSE和.gitignore
+1.3、修改本地项目
+创建README.md文件
+cd /home/mxk/localGitRepo/testRepo
+sudo touch README.md
+先将README.md添加到缓存，再记录缓存内容的快照并提交注释
+sudo git add README.md
+sudo git commit -m 'add readme file'
+1.4、将本地项目push到远程仓库（默认的master分支）
+为远程仓库github.com:1134796031/testRepo起一个本地的别名origin
+并将本地项目的master分支push到名为origin的远程仓库中
+sudo git remote remove origin
+sudo git remote add origin git@github.com:1134796031/testRepo.git
+sudo git push -u origin master
+【注意，push时本地项目中不能存在空文件夹】
+【注意，必须使用-u参数，且必须选择分支名为master】
+【由于git init时默认分支master，修改提交文件也是在master中执行的】
+
+2、fork已有项目
+本地修改后将其push到远程仓库，但不对原项目做PullRequest
+2.1、首先fork别人的项目后，将自己仓库中的同名项目clone到本地
+cd /home/mxk/localGitRepo
+sudo git clone git@github.com:1134796031/fluid.git
+2.2、修改本地项目
+cd /home/mxk/localGitRepo/fluid/api/v1alpha1/
+sudo gedit dataload_types.go
+Copyright 2022 The Fluid Authors.
+在提交修改的前后查看当前Git状态
+git status
+sudo git add .
+git status
+sudo git commit -m 'add copright'
+2.3、将本地项目push到远程仓库
+sudo git remote remove origin
+sudo git remote add origin git@github.com:1134796031/fluid.git
+sudo git push -u origin master
+
+3、fork已有项目
+先fetch最新代码，本地修改后将其push到远程仓库，并对原项目做PullRequest
+3.1、首先fork别人的项目后，将自己仓库中的同名项目clone到本地
+cd /home/mxk/localGitRepo
+sudo git clone git@github.com:1134796031/fluid.git
+3.2、原项目相对于我们fork的项目可能有更新，fetch获取最新代码到远程仓库和本地仓库
+cd /home/mxk/localGitRepo/fluid
+sudo git checkout master
+sudo git remote remove upstream
+sudo git remote add upstream git@github.com:fluid-cloudnative/fluid.git
+sudo git fetch upstream
+执行merge命令以更新本地项目
+sudo git merge upstream/master
+3.3、在本地新建分支，并在该分支中修改本地项目，再修改后将其push到远程仓库
+cd /home/mxk/localGitRepo/fluid
+sudo git checkout -b fluid-task-six
+修改本地项目文件
+sudo gedit /home/mxk/fluid/api/v1alpha1/dataload_types.go
+Copyright 2022 The Fluid Authors.
+在提交修改的前后查看当前Git状态
+git status
+sudo git add .
+git status
+3.4、将本地项目的fluid-task-six分支push到远程项目的fluid-task-six分支
+sudo git commit -m "Add the Copyright of Apache License for dataload_types.go" -s
+sudo git push origin fluid-task-six:fluid-task-six
+3.5、为"fork已有项目"的本地项目创建并提交PullRequest
+在fluid中创建并提交pull request，处理PR页面中别人提出的评论及修改意见
+sudo git checkout fluid-task-six
+根据别人评论做出修改
+sudo git add .
+本地修改commit后push到自己的Github远程仓库相应分支，等待最终merge即可
+sudo git commit -m -s "Add the Copyright of Apache License for dataload_types.go"
+sudo git push origin fluid-task-six:fluid-task-six
+
+6、分支管理
+切换分支		git checkout [name]
+查看本地分支	git branch
+创建本地分支	git branch [name]
+删除本地分支	git branch -d [name]	
+查看远程分支	git branch -r
+创建远程分支	git push origin [name]
+删除远程分支	git push origin :[name]
+
+sudo rm -rf /home/mxk/localGitRepo/fluid

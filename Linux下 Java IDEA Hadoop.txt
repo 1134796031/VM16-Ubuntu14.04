@@ -1,0 +1,423 @@
+0、查看文件目录的访问权限
+ls -l
+查看当前用户根目录/home/mxk下所有文件夹的访问权限
+ls -l /usr/local/hadoop
+查看指定目录下所有文件夹的访问权限
+
+0.1、Permission denied报错
+在用户mxk的空间中执行命令cd /usr/local/hadoop、./sbin/start-all.sh会出现该报错
+执行ls -l /usr/local/hadoop，可知/usr/local/hadoop目录下文件夹访问权限属于"用户hadoop"
+而这个命令是以用户mxk的名义执行的，因此会出现Permission denied报错
+解决这个问题有两个思路：
+
+0.1.1、新建用户mxk并切换到该用户下执行命令
+为Hadoop创建专门的用户组hadoop-user，并在该用户组下创建Hadoop用户
+groupadd hadoop-user
+指定hadoop的用户组hadoop_user及home目录/home/hadoop
+useradd -g hadoop-user -d /home/hadoop hadoop
+为创建的用户hadoop设置口令为123456
+passwd hadoop
+为用户hadoop创建实体的用户空间/home/hadoop
+sudo mkdir /home/hadoop
+useradd -d /home/hadoop hadoop
+将用户空间/home/hadoop绑定给用户hadoop
+usermod -d /home/hadoop hadoop
+切换用户空间到hadoop
+su - hadoop
+
+0.1.2、为用户mxk赋予/usr/local/hadoop目录下文件夹的访问权限
+sudo chown -R mxk:mxk /usr/local/hadoop
+
+1、安装Java
+首先查看是否已有Java环境
+java --version
+若尚未安装Java，首先在物理机下载.tar.gz文件，再将其复制到虚拟机桌面
+https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
+jdk-8u351-linux-x64.tar.gz
+新建目录并将.tar.gz文件复制到该目录下，并解压
+sudo mkdir /usr/java
+sudo cp /home/mxk/Desktop/jdk-8u351-linux-x64.tar.gz /usr/java
+cd /usr/java
+sudo tar xzf jdk-8u351-linux-x64.tar.gz -C /usr/java
+打开profile配置环境变量
+sudo gedit /etc/profile
+在最后一行新增
+export PATH USER LOGNAME MAIL HOSTNAME HISTSIZE HISTCONTRO
+export JAVA_HOME=/usr/java/jdk1.8.0_351
+export CLASSPATH=$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib
+export PATH=$JAVA_HOME/bin:$PATH
+使环境变量生效
+source /etc/profile
+检查Java_1.8.0_351安装是否成功
+java -version
+卸载Java只需要将/usr/java文件夹删除并在/etc/profile中删除Java的配置环境语句即可
+
+2、安装SSH
+首先检查是否安装SSH
+sudo service ssh status
+若未安装SSH则执行以下命令安装SSH
+sudo apt-get install openssh-server
+开启SSH服务
+sudo service ssh restart
+ssh stop/waiting
+ssh start/running, process 3910
+若SSH服务开启失败则卸载后重新安装openssh-server
+sudo apt-get remove openssh-client openssh-server
+sudo apt-get install openssh-client openssh-server
+查看防火墙状态
+sudo ufw status
+开启/关闭防火墙
+sudo ufw enable
+sudo ufw disable
+
+3、安装IDEA
+首先在物理机下载.tar.gz文件，再将其复制到虚拟机桌面
+https://www.jetbrains.com/idea/download/other.html
+ideaIU-2022.2.1.tar.gz
+将.tar.gz文件复制到/usr目录下并解压
+sudo cp /home/mxk/Desktop/ideaIU-2022.2.1.tar.gz /usr
+cd /usr
+sudo tar -zxvf ideaIU-2022.2.1.tar.gz -C /usr
+至此完成解压，开始为专业版IDEA的激活做如下准备工作
+首先将物理机的ja-netfilter文件夹复制到虚拟机桌面，再将其复制到IDEA安装目录下
+sudo cp -r /home/mxk/Desktop/ja-netfilter /usr/idea-IU-222.3739.54
+打开文件
+sudo gedit /usr/idea-IU-222.3739.54/bin/idea64.vmoptions
+在文本最后添加配置
+-javaagent:/usr/idea-IU-222.3739.54/ja-netfilter/ja-netfilter.jar
+--add-opens=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.org.objectweb.asm.tree=ALL-UNNAMED
+安装IDEA
+cd /usr/idea-IU-222.3739.54/bin
+./idea.sh
+选择ActiveIntelliJIDEA->GetLicenseFromActivationCode并输入激活码
+ZCB571FZHV-eyJsaWNlbnNlSWQiOiJaQ0I1NzFGWkhWIiwibGljZW5zZWVOYW1lIjoiZnV6emVzIGFsbHkiLCJhc3NpZ25lZU5hbWUiOiIiLCJhc3NpZ25lZUVtYWlsIjoiIiwibGljZW5zZVJlc3RyaWN0aW9uIjoiIiwiY2hlY2tDb25jdXJyZW50VXNlIjpmYWxzZSwicHJvZHVjdHMiOlt7ImNvZGUiOiJQREIiLCJmYWxsYmFja0RhdGUiOiIyMDIzLTA3LTAxIiwicGFpZFVwVG8iOiIyMDIzLTA3LTAxIiwiZXh0ZW5kZWQiOnRydWV9LHsiY29kZSI6IlBTSSIsImZhbGxiYWNrRGF0ZSI6IjIwMjMtMDctMDEiLCJwYWlkVXBUbyI6IjIwMjMtMDctMDEiLCJleHRlbmRlZCI6dHJ1ZX0seyJjb2RlIjoiUFBDIiwiZmFsbGJhY2tEYXRlIjoiMjAyMy0wNy0wMSIsInBhaWRVcFRvIjoiMjAyMy0wNy0wMSIsImV4dGVuZGVkIjp0cnVlfSx7ImNvZGUiOiJQQ1dNUCIsImZhbGxiYWNrRGF0ZSI6IjIwMjMtMDctMDEiLCJwYWlkVXBUbyI6IjIwMjMtMDctMDEiLCJleHRlbmRlZCI6dHJ1ZX0seyJjb2RlIjoiUFBTIiwiZmFsbGJhY2tEYXRlIjoiMjAyMy0wNy0wMSIsInBhaWRVcFRvIjoiMjAyMy0wNy0wMSIsImV4dGVuZGVkIjp0cnVlfSx7ImNvZGUiOiJQUkIiLCJmYWxsYmFja0RhdGUiOiIyMDIzLTA3LTAxIiwicGFpZFVwVG8iOiIyMDIzLTA3LTAxIiwiZXh0ZW5kZWQiOnRydWV9LHsiY29kZSI6IklJIiwiZmFsbGJhY2tEYXRlIjoiMjAyMy0wNy0wMSIsInBhaWRVcFRvIjoiMjAyMy0wNy0wMSIsImV4dGVuZGVkIjpmYWxzZX0seyJjb2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMy0wNy0wMSIsInBhaWRVcFRvIjoiMjAyMy0wNy0wMSIsImV4dGVuZGVkIjp0cnVlfSx7ImNvZGUiOiJQU1ciLCJmYWxsYmFja0RhdGUiOiIyMDIzLTA3LTAxIiwicGFpZFVwVG8iOiIyMDIzLTA3LTAxIiwiZXh0ZW5kZWQiOnRy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
+至此IDEA激活并安装完成，并为IDEA创建桌面快捷方式
+齿轮->CreateDesktopEntry
+
+
+4、hadoop
+4.1、新建用户hadoop及其用户空间，或将/usr/local/hadoop目录下文件夹访问权限给用户mxk
+参考Permission denied报错的处理方法
+
+4.2、安装hadoop
+实验室对外提供服务的Hadoop集群是2.7.7版本的，因此在虚拟机上安装2.7.1版本，其API可以参考
+http://hadoop.apache.org/docs/r2.7.1/api/index.html或所下载的hadoop-2.7.1.tar.gz中share/doc内容
+首先在物理机上下载hadoop-2.7.1.tar.gz并将其复制到虚拟机桌面
+https://hadoop.apache.org/release/2.7.1.html
+将tar.gz解压到/usr/local目录下，并将解压得到的文件夹名该为hadoop
+sudo tar -zxf /home/mxk/Desktop/hadoop-2.7.1.tar.gz -C /usr/local
+cd /usr/local/
+sudo mv ./hadoop-2.7.1/ ./hadoop
+在已经创建了用户hadoop的前提下，以下命令将/usr/local/hadoop目录下所有文件夹权限给用户hadoop
+sudo chown -R hadoop ./hadoop
+执行以下命令检查hadoop是否安装完成
+cd /usr/local/hadoop
+./bin/hadoop version
+
+4.3、为hadoop配置环境变量(可选)
+sudo gedit ~/.bashrc
+在文件最下面配置环境变量如下
+export JAVA_HOME=/usr/java/jdk1.8.0_351
+export CLASSPATH=$JAVA_HOME/lib:.
+export PATH=$PATH:$JAVA_HOME/bin
+export HADOOP_HOME=usr/local/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin
+激活该环境变量
+source ~/.bashrc
+至此hadoop安装完成，执行以下命令检查是否安装成功
+hadoop version
+
+4.4、免密码SSH访问配置
+相比于FTP、POP和Telnet本质上在网络上用明文传送账号密码等，SSH是专为远程登陆会话提供的协议
+通过SSH可以对传输数据加密并压缩，安全且能加快传输的速度，因此SSH保证Hadoop节点间访问安全性
+首先执行以下命令创建一个认证文件/home/mxk/.ssh/id_rsa.pub
+cd ~/.ssh/
+ssh-keygen -t rsa
+将该认证文件.pub复制并重命名为/home/mxk/.ssh/authorized_keys
+cat ./id_rsa.pub >> ./authorized_keys
+测试是否能够免密码登录
+ssh localhost
+出现报错
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+打开文件并在最后添加两行并解决问题，能够成功地执行命令ssh localhost
+sudo gedit /etc/ssh/ssh_config
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+
+4.5、hadoop的伪分布式配置
+hadoop-env.sh	Hadoop环境变量设置
+core-site.xml	主要完成NameNode的IP和端口设置
+hdfs-site.xml	主要完成HDFS的数据块副本等参数设置
+yarn-site.xml	完成ResouceManager的主机名和服务等配置
+mapred-site.xml	主要完成mapreduce framework设置和jobhistory server的设置
+slaves		完成Slaves节点IP设置
+在伪分布式中，节点即作为NameNode也作为DataNode，同时读取HDFS中的文件
+这需要修改/usr/local/hadoop/etc/hadoop目录下的两个文件：core-site.xml和hdfs-site.xml
+cd /usr/local/hadoop/
+sudo gedit ./etc/hadoop/core-site.xml
+修改为以下内容，通过以下地址访问分布式文件系统的各种数据，具体地：
+"hadoop.tmp.dir代表hadoop的临时目录"
+"fs.defaultFS代表分布式文件系统的地址"
+<configuration>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>file:/usr/local/hadoop/tmp</value>
+        <description>Abase for other temporary directories.</description>
+    </property>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+</configuration>
+cd /usr/local/hadoop
+sudo gedit ./etc/hadoop/hdfs-site.xml
+修改为以下内容，其中
+"dfs.replication代表副本的个数，伪分布式只部署在一个机器上，副本数量设置为1"
+"dfs.namenode.name.dir代表namenode的文件保存位置"
+"dfs.datanode.data.dir代表DataNode的文件保存位置"
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:/usr/local/hadoop/tmp/dfs/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:/usr/local/hadoop/tmp/dfs/data</value>
+    </property>
+</configuration>
+cd /usr/local/hadoop
+sudo gedit ./etc/hadoop/mapred-site.xml.template
+修改为以下内容，其中
+<configuration>
+    <property>
+        <name>mapred.job.tracker</name>
+        <value>localhost:9001</value>
+    </property>
+</configuration>
+cd /usr/local/hadoop
+sudo gedit ./etc/hadoop/hadoop-env.sh
+用以下语句覆盖初始化的export命令
+export JAVA_HOME=${JAVA_HOME}
+export JAVA_HOME=/usr/java/jdk1.8.0_351
+export HADOOP_COMMON_HOME=/usr/hadoop/hadoop
+export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop
+使其生效
+cd /usr/local/hadoop
+source ./etc/hadoop/hadoop-env.sh
+
+4.6、格式化Hadoop集群中每个节点NameNode的信息（只在安装时执行该命令）
+cd /usr/local/hadoop
+./bin/hadoop namenode -format
+
+4.7、启动HDFS和MapReduce
+cd /usr/local/hadoop
+./sbin/start-all.sh
+
+4.8、终止HDFS和MapReduce
+cd /usr/local/hadoop
+./sbin/stop-all.sh
+
+4.9、检查hadoop框架的所有进程是否全部启动
+执行命令jps，应该看到下面6个进程
+ResourceManager		用客户端交互分配资源和任务且能控制其他5个组件
+SecondaryNameNode	作为NameNode进程的替补
+NameNode		管理HDFS的命名空间，该进程在内存中保存文件目录等元数据
+DataNode			储存所有节点进程的数据
+NodeManager		管理所有节点进程
+Jps			监控所有节点进程
+若ResourceManager未正常启动则访问对应的日志文件查看报错信息
+cd /usr/local/hadoop/logs
+tail -500 yarn-mxk-resourcemanager-ubuntu.log
+检查其中以"Caused by"开头的内容如下
+Caused by: java.net.BindException: Problem binding to [0.0.0.0:8031] 
+java.net.BindException: Address already in use;
+这表明端口号8031已经被某个进程占据了，需要手动kill该进程后再重启hadoop
+首先查看哪个进程占据了端口8031
+sudo netstat -anp | grep 8031
+tcp6       0      0 :::8031                 :::*                    LISTEN      16358/java
+查看进程16358的具体信息
+sudo ps -ef | grep 16358
+杀死进程16358
+sudo kill 16358
+重启hadoop可见于4.7和4.8
+
+4.10、Web UI
+首先使用命令jps查看NameNode的进程号为32518，再执行以下命令找到进程32518对应的端口号为9000
+sudo netstat -ntlp
+http://localhost:9000/
+此外还有hadoop自带的WebUI
+hdfs-default.xml中dfs.namenode.http-address		http://localhost:50070	HDFS监控服务
+mapred-site.xml中mapreduce.jobhistory.webapp.address	http://localhost:19888	日志监控界面
+yarn-site.xml中yarn.resourcemanager.webapp.address	http://localhost:8088		Yarm集群信息
+其中19888端口需要执行以下命令启动jobhistoryserver服务后才可以访问
+cd /usr/local/hadoop
+sbin/mr-jobhistory-daemon.sh start historyserver
+sbin/mr-jobhistory-daemon.sh stop historyserver
+
+4.11、Hadoop测试
+再/root/test目录下新建两个txt文件
+file1.txt:	hello hadoop hello word
+file2.txt:	goodbye hadoop
+对于/root下的路径不能直接用sudo cd访问，必须先切换到root再cd，即"sudo权限"<"su root"
+sudo mkdir /root/test
+su root
+cd /root/test
+sudo gedit file1.txt
+sudo gedit file2.txt
+将两个文件复制到HDFS文件系统中的数据目录test-in
+cd /usr/local/hadoop
+./bin/hadoop dfs -copyFromLocal /root/test test-in
+运行hadoop自带的WordCount程序做测试
+该程序位于/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar中
+./bin/hadoop jar hadoop-mapreduce-examples-2.7.1.jar
+
+4.12、集群分布hadoop
+在每台机器上安装linux-java-ssh-hadoop
+在每台机器上都创建用户hadoop及用户空间
+在每台机器上都开启ssh的免密码登录
+在主节点上的/usr/local/hadoop/目录下安装hadoop，在每个子节点上创建目录usr/local/hadoop
+修改主节点的core-site.xml、hdfs-site.xml和mapred-site.xml并同样复制给从节点
+将主节点的hadoop文件夹复制到每个从节点即可，保证每个节点上hadoop具有完全一致的目录结构
+scp -r /usr/local/hadoop [从节点主机名或IP]:/usr/local/
+修改主节点的slaves，在其中列出所有从节点的主机名和IP解析配置，不需要复制给从节点
+若某台机器为NameNode，则在/etc/hosts文件中添加集群中所有节点的IP地址和对应的主机名
+若某台机器为DataNode，则在/etc/hosts文件中添加本机中NameNode的IP地址和对应的主机名
+在每台机器上执行命令：
+cd /usr/local/hadoop
+./bin/hadoop namenode -format
+./sbin/start-all.sh
+jps
+./sbin/stop-all.sh
+P28-P36
+
+4.13、在IDEA中基于Hadoop开发
+手动创建目录并将项目保存在这个目录下/home/mxk/IDEAProjects
+NewProject->/home/mxk/IDEAProjects/myHadoop->Java1.8.0_351->IntelliJ
+将hadoop依赖包引入到项目中
+File->ProjectStucture->ProjectSettings->Libraries->+Java->
+/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.7.1.jar
+/usr/local/hadoop/share/hadoop/common/hadoop-common-2.7.1.jar
+/usr/local/hadoop/share/hadoop/tools/lib/commons-cli-1.2.jar
+为项目新建Java文件
+myHadoop/src/WordCount.java
+MapReduce格式的算法描述
+file1:	Hello World Bye World
+file2:	Hello Hadoop GoodBye Hadoop
+file1->Map1-><Hello,1>,<World,1>,<Bye,1>,<World,1>
+file2->Map2-><Hello,1>,<Hadoop,1>,<GoodBye,1>,<Hadoop,1>
+(Map1,Map2)->Reduce-><Hello,2>,<World,2>,<Hadoop,2>,<Bye,1>,<GoodBye,1>
+在WordCount.java中实现Map类、Reduce类、main函数，具体逻辑细节见java文件
+将WordCount.java编译得到jar打包文件
+File->ProjectStructure->ProjectSettings->Artifacts->JAR->FromModulesWithDependencies
+(Module:myHadoop,MainClass:WordCount,extract to the target JAR)->include in project build->Apply
+Build->BuildArtifacts->myHadoop:jar->Build
+此时得到myHadoop/out/artifacts/myHadoop_jar/myHadoop.jar
+在/usr/local/hadoop下面新建一个job目录，将打包好的jar包放置在此目录下
+sudo mkdir /usr/local/hadoop/job/
+sudo cp /home/mxk/IDEAProjects/myHadoop/out/artifacts/myHadoop_jar/myHadoop.jar /usr/local/hadoop/job
+
+创建输入文件
+sudo mkdir /usr/local/hadoop/input
+cd /usr/local/hadoop/input
+sudo gedit file1.txt
+Hello World
+Bye World
+sudo gedit file2.txt
+Hello Hadoop
+GoodBye Hadoop
+
+cd /usr/local/hadoop
+hadoop的输入输出都是在hdfs文件系统上执行的，因此需要在hdfs内创建以下目录
+创建hdfs中的用户目录/user/hadoop【实际上hdfs中/user/hadoop/input/的实体目录为/usr/local/hadoop/input】
+./bin/hdfs dfs -mkdir -p /user/hadoop
+创建hdfs中的输入目录/user/hadoop/input
+./bin/hdfs dfs -mkdir /user/hadoop/input
+将/usr/local/hadoop/input下的文件复制到hdfs中的/user/hadoop/input中
+./bin/hdfs dfs -put ./input/*.txt /user/hadoop/input
+查看hdfs的/user/hadoop/input下的文件
+./bin/hdfs dfs -ls /user/hadoop/input
+运行jar中的job
+./bin/hadoop jar ./job/myHadoop.jar /user/hadoop/input /user/hadoop/output
+查看hdfs的输出结果
+./bin/hdfs dfs -cat /user/hadoop/output/*
+将hdfs的输出结果拷贝到本地的/usr/local/hadoop/output中，首先删除本地的/usr/local/hadoop/output文件夹
+rm -r ./output
+./bin/hdfs dfs -get /user/hadoop/output ./output
+cat ./output/*
+善后工作，hdfs中运行job时不能存在输出目录output
+因此每运行一个job后将输出拷贝至本地output后，删除hdfs的input和output目录
+cd /usr/local/hadoop/
+./bin/hdfs dfs -rm -r /user/hadoop/input
+./bin/hdfs dfs -rm -r /user/hadoop/output
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6、Linux下的环境变量问题
+在某个目录下执行命令sudo ls -a，即可查看到当前目录下所有可见或不可见的文件和目录
+
+对当前用户永久生效
+sudo gedit ~/.bashrc
+source ~/.bashrc
+sudo gedit ~/.bash_profile
+source ~/.bash_profile
+
+对所有用户永久生效
+sudo gedit /etc/bash.bashrc
+source /etc/bash.bashrc
+sudo gedit /etc/profile
+source /etc/profile
+sudo gedit /etc/environment
+source /etc/environment
+
+注意以上五个文件是有优先级顺序的，高优先级会覆盖低优先级：
+/etc/environment > /etc/profile > /etc/bash.bashrc > ~/.bash_profile > ~/.bashrc
+
+
+
+
+
+
+
+
+
+
+
+
+

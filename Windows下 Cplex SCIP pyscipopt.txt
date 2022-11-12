@@ -1,0 +1,61 @@
+1、安装Cplex
+cplex12.8.0下载地址
+链接：https://pan.baidu.com/s/1T9rNXIWMXKNWQtGIwSKa3A 
+提取码：2wz2
+
+安装教程
+https://blog.csdn.net/weixin_42558142/article/details/124726485
+
+cplex安装地址
+C:\Program Files\IBM\ILOG\CPLEX_Studio128
+cplex样例仓库
+C:\Users\adminstor\Documents\IBM\ILOG\CPLEX_Studio128
+cplex工作空间
+C:\Users\adminstor\AppData\Roaming\IBM\ILOG\CPLEX_Studio128\workspace
+
+cplex只支持少数几个python版本如3.6，因此需要首先新建并更换cmd、Anaconda和pycham中的python3.6版本的环境python36
+在支持python3.6环境的cmd右键选择"以管理员身份运行"，并cd到以下路径执行命令python setup.py install 
+C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\python\3.6\x64_win64
+
+更换python版本：
+1.1、在Anaconda Prompt (anaconda3)下输入以下命令：
+conda create --name python36 python=3.6
+conda activate python36
+python --version
+至此已经创建完成新环境python36，找到该环境的绝对路径"E:\anaconda3\envs\python36"
+"系统变量Path"-"编辑环境变量"-"新建E:\anaconda3\envs\python36"
+
+1.2、在Anaconda Navigator中可以查看在anaconda中注册的所有python版本
+切换到其他指定的版本，则重复以上步骤
+切换回默认的base(root)版本，则输入：
+conda deactivate
+python --version
+删除一个在anaconda中注册的python环境
+conda remove --name python36 --all
+
+1.3、切换pycharm中使用的python环境
+settings-PythonInterpreter-Add-Existing environment-"E:\anaconda3\envs\python36\python.exe"
+
+
+2、Soplex-SCIPOptSuite-pyscipopt
+https://www.scipopt.org/index.php#download
+从中下载SCIPOptSuite-6.0.1-win64-VS15.exe，这是经过预编译的可执行文件
+其中包括了soplex-4.0.1和scip-6.0.1
+安装到E:\SCIPOptSuite并选择自动添加path到环境变量
+cmd输入scip.exe查看是否安装成功
+AnacondaPrompt执行以下命令（Pycharm的Terminal会报错）
+set SCIPOPTDIR="E:\SCIPOptSuite"
+pip install pyscipopt==2.1.5
+
+pip uninstall pyscipopt
+
+
+
+
+
+
+
+
+
+
+

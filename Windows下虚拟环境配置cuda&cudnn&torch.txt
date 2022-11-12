@@ -1,0 +1,31 @@
+import torch
+import platform
+print(platform.python_version())                	# 3.6.13
+print(torch.__version__)                        		# 1.10.2
+print(torch.version.cuda)                       		# 11.3
+print(torch.backends.cudnn.version())           	# 8200
+print(torch.cuda.is_available())                		# True
+
+参考教程
+https://blog.csdn.net/qq_43705697/article/details/121618276
+在虚拟环境中只能使用conda/pip命令行的方式安装cuda/cudnn/pytorch
+因此首先需要查询命令行当前所支持的最新的cuda/cudnn/pytorch版本，再点击url下载对应的CONDA文件，再安装本地CONDA文件
+
+查询并安装cuda
+conda search cudatoolkit --info
+https://repo.anaconda.com/pkgs/main/win-64/cudatoolkit-11.3.1-h59b6b97_2.conda
+conda install --use-local C:\Users\adminstor\Downloads\cudatoolkit-11.3.1-h59b6b97_2.conda
+
+查询并安装cudnn
+conda search cudnn --info
+https://repo.anaconda.com/pkgs/main/win-64/cudnn-8.2.1-cuda11.3_0.conda
+conda install --use-local C:\Users\adminstor\Downloads\cudnn-8.2.1-cuda11.3_0.conda
+
+再pytoch官网上查询满足上述cuda版本的pytorch版本并安装
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+
+卸载pytorch，根据安装时所使用的命令选择对应的卸载命令
+conda uninstall pytorch
+conda uninstall libtorch
+pip uninstall torch
+pip3 uninstall torch

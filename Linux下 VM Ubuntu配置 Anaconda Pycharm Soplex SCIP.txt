@@ -1,0 +1,319 @@
+0、常见问题
+当遇到***: Permission denied时
+表示执行该命令的权限不够，在该命令前添加sudo即可
+
+当遇到Unable to locate package时
+更新软件列表
+sudo apt-get update
+更新软件
+sudo apt-get upgrade
+
+出现0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.表示成功
+否则执行下面的命令，升级相应的包
+sudo apt-get dist-upgrade
+
+查看某个包的版本、卸载并安装指定版本
+cmake --version
+sudo apt-get remove cmake
+
+1、
+安装VMware Workstation Pro 16，并在虚拟机中部署ubuntu-21.10-desktop-amd64.iso
+https://blog.csdn.net/thy0000/article/details/122627501?spm=1001.2014.3001.5501
+
+VMware Workstation Pro 16 的激活密钥
+ZF3R0-FHED2-M80TY-8QYGC-NPKYF
+
+虚拟机
+全名：Ubuntu 64 位
+用户名：mxk
+密码：123456
+内存：16G-16384MB
+硬盘：200G：E:\VMware ubuntu-21.10\Ubuntu 64 位.vmdk
+
+后续修改虚拟机硬件设置（需要关闭虚拟机）
+我的计算机/Ubuntu 64 位/编辑虚拟机设置/
+
+2、
+2.1、面向小文件的拖拽复制
+安装VMwareTools，首先需要解决"安装VMwareTools安装"灰色
+https://blog.csdn.net/qq_40259641/article/details/79022844
+https://blog.csdn.net/thy0000/article/details/122638884?spm=1001.2014.3001.5502
+
+2.2、面向大文件的共享文件夹
+2.2.1、设置-选项-共享文件夹-总是启用-添加-选择路径E:\VMware_ubuntu_share-启用此共享
+虽然此前已经安装了VMwareTool，但可能是安装时误输入了no，也可能是初次安装时未开启"共享文件夹"
+总之目前已安装的VMwareTool缺少组件vmhgfs-fuse，因此需要重新安装VMwareTool，如下
+2.2.2、重新安装VMwareTools：
+在保持虚拟机打开的情况下，设置-移除已有的CD/DVD，添加新的CD/DVD-
+使用ISO映像文件E:/VMware ubuntu-14.04.6/ubuntu-14.04.6-desktop-amd64.iso，重新安装VMwareTools
+将VMwareTools-10.3.23-16594550.tar.gz复制到/home/mxk/Documents，并在此目录下解压
+cd /home/mxk/Documents/
+tar -zxvf VMwareTools-10.3.23-16594550.tar.gz
+cd /home/mxk/Documents/vmware-tools-distrib/
+sudo ./vmware-install.pl
+所有询问yes/no的都输入yes并回车，所有询问安装目录的直接回车
+2.2.3、至此已经保证了VMtool的支持需要在Linux内进行额外设置
+新建共享文件夹
+mkdir /mnt/win
+创建共享文件夹
+sudo mount -t fuse.vmhgfs-fuse .host:/ /mnt/win -o allow_other,defaults
+cd /mnt/win/VMware_ubuntu_share
+即为虚拟机下的共享文件夹目录，执行以下命令可以查看共享文件夹
+vmware-hgfsclient
+2.2.4、将目标数据复制到共享文件夹下
+sudo cp -r /home/mxk/PycharmProjects/ds4dm_Hybrid_learn2branch/data /mnt/win/VMware_ubuntu_share
+
+3、Anaconda3
+在物理机上下载Anaconda3-2022.05-Linux-x86_64.sh
+将该文件复制到虚拟机的Downloads目录下
+打开Terminal执行以下命令以安装anaconda
+cd Downloads/
+bash Anaconda3-2022.05-Linux-x86_64.sh
+cd /
+cd home/mxk/anaconda3/
+conda list
+
+为conda命令配置环境变量
+sudo gedit ~/.bashrc
+找到anaconda3的位置，在最后一行新加一行
+export PATH=$PATH:/home/root/anaconda3/bin
+保存并退出后激活用户目录
+source ~/.bashrc
+
+打开anaconda的可视化界面
+anaconda-navigator
+
+打开AncondaPrompt
+cd /
+cd home/mxk/anaconda3/
+conda activate
+退出AnacondaPrompt
+conda deactivate
+
+4、Pycharm
+在物理机上下载pycharm-community-2021.1.3.tar.gz
+将该文件复制到虚拟机的Downloads目录下，并extract在Downloads目录下
+打开Terminal执行以下命令以安装Pycharm
+sudo apt-get install realpath
+cd Downloads/pycharm-community-2021.1.3/bin/
+sh ./pycharm.sh
+Continue->Dontsend->齿轮->CreateDesktopEntry
+
+在Pycharm中新建project并使用anaconda3所属的python环境
+Interpreter：/home/mxk/anaconda3/bin/python3.9
+CondaExecutable：/home/mxk/anaconda3/bin/conda
+
+5、安装指定版本的Cmake
+进入下面网址选择想要安装的版本
+https://cmake.org/files/
+鉴于Cmake不同版本的安装方式大相径庭，这里建议安装已经成功过的3.20.0版本
+https://cmake.org/files/v3.20/cmake-3.20.0-linux-x86_64.tar.gz
+在物理机上下载cmake-3.20.0-linux-x86_64.tar.gz
+将该文件复制到虚拟机的Downloads目录下，并extract在Downloads目录下
+cd Downloads/
+sudo mv cmake-3.20.0-linux-x86_64 /opt/cmake-3.20.0
+创建软链接
+sudo ln -sf /opt/cmake-3.20.0/bin/*  /usr/bin/
+查询Cmake版本
+cmake --version
+
+若出现错误cmake: Permission denied
+则为Cmake修改执行权限
+chmod 777 cmake ccmake cmake-gui cpack ctest
+
+6、安装gcc、g++
+6.1、安装Ubuntu14.04自带的gcc4.8.1
+sudo apt-get install build-essential
+gcc --version
+g++ --version
+
+6.2、安装指定版本的gcc
+下载gcc-9.1.0.tar.gz并复制到虚拟机桌面
+http://mirror.linux-ia64.org/gnu/gcc/releases/gcc-9.1.0/
+将tar.gz复制到opt/gcc下并解压
+sudo mkdir /opt/gcc
+cp /home/mxk/Desktop/gcc-9.1.0.tar.gz /opt/gcc/
+cd /opt/gcc
+tar -xzvf gcc-9.1.0.tar.gz
+不要在源代码目录下编译而是在相同目录下新建build文件夹
+mkdir gcc-9.1.0-build
+联网安装gcc9.1相关依赖项
+若安装失败说明download_prerequisites中的服务器地址挂了，gedit将其中的
+base_url='ftp://gcc.gnu.org/pub/gcc/infrastructure/'替换为镜像服务器地址
+base_url='http://mirror.linux-ia64.org/gnu/gcc/infrastructure/'若还是失败则类似修改其他地址
+cd gcc-9.1.0-build
+../gcc-9.1.0/contrib/download_prerequisites
+运行configure命令生成Makefile
+../gcc-7.3.0/configure -enable-checking=release -enable-languages=c,c++ -disable-multilib
+运行make命令根据Makefile编译构建GCC编译器(耗时很长)
+make
+安装GCC编译器，默认将GCC编译器安装在/usr/local下，即
+头文件在/usr/local/include，可执行文件在/usr/local/bin，库文件在/usr/local/lib
+sudo make install
+机器上可以存在不同版本的GCC编译器，为不同版本配置优先级来设置默认GCC编译器版本
+<链接> <名称> <路径> <优先级>
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 50
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 50
+查询本机已有的GCC/G++编译器版本
+sudo update-alternatives --query gcc
+sudo update-alternatives --query g++
+选择默认使用的GCC/G++编译器版本
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+查询当前使用的gcc/g++版本
+gcc --version
+g++ --version
+降低GCC编译器版本
+首先删除已有的低优先级的老GCC配置项，再以更高优先级配置老GCC，最后更改
+sudo update-alternatives --remove gcc /usr/bin/gcc-4.8.1
+sudo update-alternatives --remove g++ /usr/bin/g++-4.8.1
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8.1 70
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8.1 70
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+
+7、安装SoPlex、SCIP、ds4dm_PySCIPOpt、ecole
+/home/mxk/PycharmProjects/BB/
+下载两个tgz文件到上面的路径
+https://soplex.zib.de/download.php?fname=soplex-4.0.1.tgz
+https://scip.zib.de/download.php?fname=scip-6.0.1.tgz
+下载vanillafullstrong.patch到上面的路径
+https://github.com/ds4dm/learn2branch/tree/master/scip_patch
+下载ecole文件夹到上面的路径
+https://github.com/pandat8/ML4LB/tree/master/ecole
+下载PySCIPOpt文件夹到上面的路径
+https://github.com/linjc16/TBranT/tree/master/PySCIPOpt
+执行以下命令将该目录下所有文件设置为"任何用户都可访问"
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+设置安装目录：
+export SCIPOPTDIR='/opt/scip'
+
+sudo rm -rf /home/mxk/PycharmProjects/BB/soplex-4.0.1
+sudo rm -rf /home/mxk/PycharmProjects/BB/scip-6.0.1
+
+7.1、下载并安装soplex-4.0.1
+cd /home/mxk/PycharmProjects/BB
+tar -xzf soplex-4.0.1.tgz
+cd soplex-4.0.1/
+mkdir build
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$SCIPOPTDIR
+make -C ./build -j 4
+sudo make -C ./build install
+
+7.2、下载并安装scip-6.0.1
+cd /home/mxk/PycharmProjects/BB
+tar -xzf scip-6.0.1.tgz
+cd scip-6.0.1/
+patch -p1 < ../vanillafullstrong.patch
+mkdir build
+cmake -S . -B build -DSOPLEX_DIR=$SCIPOPTDIR -DCMAKE_INSTALL_PREFIX=$SCIPOPTDIR
+make -C ./build -j 4
+sudo make -C ./build install
+
+为scip和soplex配置环境，在.bashrc的最后一行添加下面语句
+sudo gedit ~/.bashrc
+export PATH=$PATH:/opt/scip/bin
+source ~/.bashrc
+
+sudo rm -rf /opt/scip
+
+7.3、手动将scip-6.0.1目录下的某些h文件复制到PySCIPOpt的安装目录/opt/scip
+sudo mkdir /opt/scip
+sudo mkdir /opt/scip/include
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+sudo cp -r /home/mxk/PycharmProjects/BB/scip-6.0.1/src/. /opt/scip/include/
+注意scip-6.0.1/src这个目录是隐藏的，此外scip-6.0.1/src下缺少文件config.h，因此还需要执行命令
+sudo cp /home/mxk/PycharmProjects/BB/scip-6.0.1/build/scip/config.h /opt/scip/include/scip/
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+sudo chmod 777 -Rfv /opt/scip/
+sudo chmod 777 -Rfv /opt/scip/include/scip
+
+7.4、修改ds4dm/PySCIPOpt@ml-branching/src/pyscipopt/scip.pyx
+由于我们想要复现的实验是Hybrid-learn2branch，而下载的PySCIPOpt库支持的实验是learn2branch
+因此PySCIPOpt需要为库中的Column类新增一个方法getIndex
+否则会在02_generate_dataset.py中运行以下语句出现报错：；
+x.getCol().getIndex() for x in self.model.getVars(transformed=True
+AttributeError: 'pyscipopt.scip.Column' object has no attribute 'getIndex'
+这表明在安装的ds4dm/PySCIPOpt@ml-branching/src/pyscipopt/scip.pyx中
+Column类(294行)缺少方法getIndex：
+sudo gedit /home/mxk/PycharmProjects/BB/PySCIPOpt/src/pyscipopt/scip.pyx
+该方法实现在Hybrid-learn2branch项目的README中
+https://github.com/pg2455/Hybrid-learn2branch
+同时这个报错也出现在该项目的issues中
+https://github.com/pg2455/Hybrid-learn2branch/issues/2
+完成此步骤才能执行python setup.py install
+
+7.5、正式安装PySCIPOpt（ds4dm-ml-branching版本）
+cd /home/mxk/PycharmProjects/BB/
+git clone --branch ml-branching git@github.com:ds4dm/PySCIPOpt.git
+执行7.4修改其中的scip.pyx文件
+export SCIPOPTDIR='/opt/scip'
+cd /home/mxk/PycharmProjects/BB/PySCIPOpt
+python setup.py install
+安装成功信息为：
+Installed /home/mxk/anaconda3/lib/python3.9/site-packages/PySCIPOpt-2.1.5-py3.9-linux-x86_64.egg
+Processing dependencies for PySCIPOpt==2.1.5
+Finished processing dependencies for PySCIPOpt==2.1.5
+
+7.6、安装本地的PySCIPOpt（tsinghua版本）
+下载PySCIPOpt文件夹到上面的路径
+https://github.com/linjc16/TBranT/tree/master/PySCIPOpt
+执行以下命令将该目录下所有文件设置为"任何用户都可访问"
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+cd /home/mxk/PycharmProjects/BB/PySCIPOpt
+export SCIPOPTDIR='/opt/scip'
+python setup.py install
+
+7.7、安装远程的ecole
+
+7.8、安装本地的ecole
+首先需要本地安装Cmake>=3.15,gcc/g++>=9.1,SCIP,python,numpy
+下载ecole文件夹到上面的路径
+https://github.com/pandat8/ML4LB/tree/master/ecole
+执行以下命令将该目录下所有文件设置为"任何用户都可访问"
+sudo chmod 777 -Rfv /home/mxk/PycharmProjects/BB/*
+cd /home/mxk/PycharmProjects/BB/ecole
+cmake -B build/
+cmake --build build/ --parallel
+python -m pip install build/python
+
+7.9、安装svmrank
+git clone http://github.com/ds4dm/PySVMRank.git
+cd PySVMRank
+wget http://download.joachims.org/svm_rank/current/svm_rank.tar.gz
+mkdir src/c
+tar -xzf svm_rank.tar.gz -C src/c
+pip install .
+
+8、安装cuda&cudnn
+事实上虚拟机本身是不能安装cuda和cudnn的，因为虚拟机使用的是虚拟显卡
+但对于Ubuntu 16.04以上版本可以通过安装vSphere Bitfusion再安装cuda和cudnn
+但对于Ubuntu 14.04以下版本不能安装vSphere Bitfusion
+https://blog.csdn.net/sizaif/article/details/115794358
+
+9、增强虚拟机性能
+硬件-移除不必要的设备
+硬件-处理器-勾选开启三个虚拟化引擎
+硬件-硬盘-碎片整理(定期执行这个)
+选项-高级-进程优先级-抓取输入内容高-禁止内存页面修改
+设备-取消虚拟机运行时在主机上禁用自动运行
+菜单栏-编辑-首选项-内存-调整所有虚拟机内存使其适应预留的主机RAM
+菜单栏-编辑-首选项-优先级-抓取输入内容高--取消两个快照
+
+查看物理机中的CPU性能
+任务管理器-性能-CPU-(内核:12,逻辑处理器20)	虚拟机处理器数量1(固定为1)每个处理器内核数量16(16<20)
+任务管理器-性能-内存-32G			虚拟机内存16G(32G的一半)
+
+10、安装torch-cpu
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+
+11、安装tensorflow-cpu-1.12.0
+下载tensorflow-1.12.0-cp35-cp35m-win_amd64.whl并复制到虚拟机桌面
+https://pan.baidu.com/s/1IlLn01AxShdtycyiUhIvyA?nvbq
+sudo cp /home/mxk/Desktop/tensorflow-1.12.0-cp35-cp35m-win_amd64.whl /home/mxk/PycharmProjects/
+将当前项目的python版本换成3.6
+File->settings->PythonInterpreter->Add->CondaEnvironment->NewEnvironment->Pythonversion3.6
+在pycharm的Terminal下输入以下命令安装whl
+pip install /home/mxk/PycharmProjects/tensorflow-1.12.0-cp35-cp35m-win_amd64.whl
+
+
